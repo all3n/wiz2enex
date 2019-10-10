@@ -64,7 +64,7 @@ class EnexNote(object):
         attr_node.append(self.create_text("latitude","39.98448788609160"))
         attr_node.append(self.create_text("longitude","116.48423680726793"))
         attr_node.append(self.create_text("altitude","48.34932327270508"))
-        attr_node.append(self.create_text("author",author))
+        attr_node.append(self.create_text("author", self.author))
         attr_node.append(self.create_text("source","desktop.mac"))
 
         note.append(attr_node)
@@ -125,15 +125,14 @@ if __name__ == '__main__':
         ee = EnexExport()
         data_path = data_location(acc)
         db_file = os.path.join(data_path, 'index.db')
-        fetch_sql = "select DOCUMENT_GUID, DOCUMENT_TITLE, DOCUMENT_LOCATION, DOCUMENT_URL,DOCUMENT_AUTHOR, DT_CREATED,DT_MODIFIED from WIZ_DOCUMENT limit 1"
+        fetch_sql = "select DOCUMENT_GUID, DOCUMENT_TITLE, DOCUMENT_LOCATION, DOCUMENT_URL, DT_CREATED,DT_MODIFIED from WIZ_DOCUMENT"
         notes = read_from_db(db_file, fetch_sql)
-        for hash_val, notetitle, location, url, author, created, modified in notes:
+        for hash_val, notetitle, location, url, created, modified in notes:
             datec = datetime.strptime(created,  "%Y-%m-%d %H:%M:%S").strftime("%Y%m%dT%H%M%SZ")
             datem = datetime.strptime(modified, "%Y-%m-%d %H:%M:%S").strftime("%Y%m%dT%H%M%SZ")
             note_file = os.path.join(data_path, 'notes', '{'+hash_val+'}')
             zf = zipfile.ZipFile(note_file)
             fname = zf.namelist()[0]
             content = zf.open(fname).read().decode('utf-8')
-            ee.add_note(notetitle, content, datec, datem, author)
-
+            ee.add_note(notetitle, content, datec, datem, acc)
         ee.export("%s.enex" % acc)
