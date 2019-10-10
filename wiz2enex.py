@@ -125,7 +125,7 @@ if __name__ == '__main__':
         ee = EnexExport()
         data_path = data_location(acc)
         db_file = os.path.join(data_path, 'index.db')
-        fetch_sql = "select DOCUMENT_GUID, DOCUMENT_TITLE, DOCUMENT_LOCATION, DOCUMENT_URL,DOCUMENT_AUTHOR, DT_CREATED,DT_MODIFIED from WIZ_DOCUMENT"
+        fetch_sql = "select DOCUMENT_GUID, DOCUMENT_TITLE, DOCUMENT_LOCATION, DOCUMENT_URL,DOCUMENT_AUTHOR, DT_CREATED,DT_MODIFIED from WIZ_DOCUMENT limit 1"
         notes = read_from_db(db_file, fetch_sql)
         for hash_val, notetitle, location, url, author, created, modified in notes:
             datec = datetime.strptime(created,  "%Y-%m-%d %H:%M:%S").strftime("%Y%m%dT%H%M%SZ")
@@ -133,7 +133,7 @@ if __name__ == '__main__':
             note_file = os.path.join(data_path, 'notes', '{'+hash_val+'}')
             zf = zipfile.ZipFile(note_file)
             fname = zf.namelist()[0]
-            content = zf.open(fname).read()
+            content = zf.open(fname).read().decode('utf-8')
             ee.add_note(notetitle, content, datec, datem, author)
 
         ee.export("%s.enex" % acc)
